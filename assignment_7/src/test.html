@@ -1,0 +1,16 @@
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>Quick IPL Test</title></head>
+<body>
+<pre id="out">Loading…</pre>
+<script>
+fetch('https://my-json-server.typicode.com/FreSauce/json-ipl/data')
+  .then(r => r.json())
+  .then(data => {
+    data.sort((a,b) => Number(a.NRR) - Number(b.NRR));
+    document.getElementById('out').textContent = JSON.stringify(data, null, 2);
+  })
+  .catch(err => document.getElementById('out').textContent = 'Error: ' + err);
+</script>
+</body>
+</html>
