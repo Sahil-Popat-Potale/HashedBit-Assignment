@@ -1,0 +1,493 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>JS Exercises — Assignment 9</title>
+
+  <!-- Google font for nicer look (falls back to system fonts) -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --accent: #7afcff;      /* cyan accent */
+      --muted: rgba(255,255,255,0.75);
+      --glass-bg: rgba(255,255,255,0.06);
+      --glass-border: rgba(255,255,255,0.12);
+      --panel-radius: 14px;
+      --max-width: 1100px;
+    }
+
+    /* Full-bleed background image (provided by user) */
+    html,body{height:100%; margin:0;}
+    body{
+      font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      color: #eaf6f6;
+      background:
+        linear-gradient(180deg, rgba(2,8,15,0.45), rgba(2,8,15,0.6)),
+        url("https://miro.medium.com/v2/1*uKbcXDBxEmv3FybfNXkf4Q.png") center/cover no-repeat fixed;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      display:flex;
+      justify-content:center;
+      padding:36px 20px;
+    }
+
+    /* main container */
+    .wrap{
+      width:100%;
+      max-width:var(--max-width);
+      display:grid;
+      grid-template-columns: 1fr 380px;
+      gap:20px;
+      align-items:start;
+    }
+
+    /* header + intro spanning columns */
+    header.site-header{
+      grid-column: 1 / -1;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+    }
+
+    header .title {
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+    }
+    header h1{
+      margin:0;
+      font-size:1.6rem;
+      font-weight:700;
+      letter-spacing:0.2px;
+      color: white;
+      text-shadow: 0 6px 20px rgba(0,0,0,0.6);
+    }
+    header p.lead{
+      margin:0;
+      color: var(--muted);
+      font-size:0.95rem;
+    }
+
+    /* glass panel base */
+    .glass {
+      background: var(--glass-bg);
+      border-radius: var(--panel-radius);
+      border: 1px solid var(--glass-border);
+      box-shadow: 0 8px 30px rgba(0,0,0,0.45);
+      backdrop-filter: blur(10px) saturate(120%);
+      -webkit-backdrop-filter: blur(10px) saturate(120%);
+      padding:16px;
+      color: #eaf6f6;
+    }
+
+    /* left column: content sections */
+    .main {
+      display:flex;
+      flex-direction:column;
+      gap:16px;
+    }
+
+    section { overflow:visible; }
+    section h2 { margin:0 0 10px 0; font-size:1.05rem; color: #e9fbff; }
+    section p { margin:0; color:var(--muted); font-size:0.95rem; }
+
+    .row { display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-top:10px; }
+    button {
+      padding:8px 12px;
+      border-radius:10px;
+      border:1px solid rgba(255,255,255,0.12);
+      background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+      color: #eaf6f6;
+      cursor:pointer;
+      font-weight:600;
+      transition: transform .12s, box-shadow .12s;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.4);
+    }
+    button:hover{ transform: translateY(-3px); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+    input[type="text"], input[type="number"] {
+      padding:8px 10px;
+      border-radius:10px;
+      border:1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.03);
+      color: #eaf6f6;
+      font-size:0.95rem;
+      min-width:160px;
+    }
+
+    .output {
+      margin-top:10px;
+      font-family: "Fira Mono", monospace;
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      padding:10px;
+      border-radius:10px;
+      border:1px solid rgba(255,255,255,0.04);
+      color: #dff9fb;
+      white-space:pre-wrap;
+    }
+
+    /* right column: sticky controls */
+    .sidebar {
+      position:sticky;
+      top:36px;
+      align-self:start;
+      display:flex;
+      flex-direction:column;
+      gap:16px;
+    }
+
+    .small {
+      font-size:0.85rem;
+      color:var(--muted);
+    }
+
+    /* code block style */
+    pre.code {
+      background: rgba(0,0,0,0.25);
+      padding:12px;
+      border-radius:8px;
+      overflow:auto;
+      color: #e0f7ff;
+      border:1px solid rgba(255,255,255,0.04);
+    }
+
+    /* responsive */
+    @media (max-width:980px){
+      .wrap { grid-template-columns: 1fr; }
+      .sidebar { position:relative; top:0; }
+    }
+
+    /* subtle accent underline for headings */
+    h2::after {
+      content: "";
+      display:block;
+      width:48px;
+      height:3px;
+      margin-top:10px;
+      border-radius:3px;
+      background: linear-gradient(90deg, var(--accent), rgba(122,252,255,0.2));
+      opacity:0.9;
+    }
+
+    /* a gentle card header */
+    .card-head {
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:8px;
+    }
+
+    /* small helper */
+    .muted { color:var(--muted); font-size:0.9rem; }
+
+  </style>
+</head>
+<body>
+  <div class="wrap">
+
+    <header class="site-header">
+      <div class="glass" style="display:flex;gap:14px;align-items:center; padding:18px;">
+        <svg width="56" height="56" viewBox="0 0 64 64" aria-hidden="true" style="flex:0 0 auto; border-radius:10px; background: linear-gradient(135deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02)); padding:8px;">
+          <rect width="64" height="64" rx="12" fill="rgba(255,255,255,0.03)"></rect>
+          <text x="50%" y="54%" text-anchor="middle" fill="#7afcff" font-size="28" font-weight="700" font-family="Inter, sans-serif">JS</text>
+        </svg>
+
+        <div class="title">
+          <h1>JavaScript Tasks — Assignment 9</h1>
+          <p class="lead">Interactive demo of the Assignment 9. Click any button to run an example.</p>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main (left) -->
+    <main class="main">
+
+      <!-- 1. Scope demo -->
+      <section class="glass" id="scope">
+        <div class="card-head">
+          <div>
+            <h2>1) let / const / var scope demo</h2>
+            <p class="muted">Click the button to run a demo function that declares <code>var</code>, <code>let</code>, and <code>const</code> inside a block and shows where each is visible.</p>
+          </div>
+          <div><button id="runScope">Run</button></div>
+        </div>
+        <div id="scopeOut" class="output" aria-live="polite"></div>
+      </section>
+
+      <!-- 2. Fruits array -->
+      <section class="glass" id="fruitsSection">
+        <h2>2) Fruits array — return second fruit</h2>
+        <p class="muted">We create an array <code>fruits</code> and a function that returns the second fruit.</p>
+        <div class="row">
+          <button id="secondFruitBtn">Get second fruit</button>
+        </div>
+        <div id="fruitOut" class="output"></div>
+      </section>
+
+      <!-- 3. push/pop modify array -->
+      <section class="glass">
+        <h2>3) push() then pop()</h2>
+        <p class="muted">Add an element using <code>push()</code>, then remove the last element using <code>pop()</code>.</p>
+        <label class="muted">New element:
+          <input id="pushVal" type="text" value="kiwi" />
+        </label>
+
+        <div class="row">
+          <button id="pushPopBtn">Push then Pop</button>
+        </div>
+        <div id="pushPopOut" class="output"></div>
+      </section>
+
+      <!-- 4. map: square numbers -->
+      <section class="glass">
+        <h2>4) Map numbers to their squares</h2>
+        <div class="row">
+          <button id="squareBtn">Square [1,2,3,4,5]</button>
+        </div>
+        <div id="squareOut" class="output"></div>
+      </section>
+
+      <!-- 5. filter odd numbers -->
+      <section class="glass">
+        <h2>5) Filter out even numbers (keep odds)</h2>
+        <div class="row">
+          <button id="filterBtn">Filter odds from [1..10]</button>
+        </div>
+        <div id="filterOut" class="output"></div>
+      </section>
+
+      <!-- 6. person object greeting -->
+      <section class="glass">
+        <h2>6) person object and greeting</h2>
+        <div class="row">
+          <button id="greetBtn">Greet person</button>
+        </div>
+        <div id="greetOut" class="output"></div>
+      </section>
+
+      <!-- 7. rectangle area -->
+      <section class="glass">
+        <h2>7) Rectangle area (object with width & height)</h2>
+        <div class="row">
+          <button id="areaBtn">Area of {width:6, height:4}</button>
+        </div>
+        <div id="areaOut" class="output"></div>
+      </section>
+
+      <!-- 8. object keys -->
+      <section class="glass">
+        <h2>8) Object.keys()</h2>
+        <div class="row">
+          <button id="keysBtn">Get keys of {a:1,b:2,c:3}</button>
+        </div>
+        <div id="keysOut" class="output"></div>
+      </section>
+
+      <!-- 9. merge objects -->
+      <section class="glass">
+        <h2>9) Merge two objects (Object.assign)</h2>
+        <div class="row">
+          <button id="mergeBtn">Merge {x:1} and {y:2,z:3}</button>
+        </div>
+        <div id="mergeOut" class="output"></div>
+      </section>
+
+      <!-- 10. reduce sum -->
+      <section class="glass">
+        <h2>10) Sum of numbers using reduce()</h2>
+        <div class="row">
+          <button id="sumBtn">Sum [2,4,6,8]</button>
+        </div>
+        <div id="sumOut" class="output"></div>
+      </section>
+
+    </main>
+
+    <!-- Right column: short help + code -->
+    <aside class="sidebar">
+      <div class="glass">
+        <h2>Quick Tips</h2>
+        <p class="muted">This page demonstrates fundamental JS features with a modern UI. Use the buttons to run examples — results appear in the translucent panels and in the console.</p>
+      </div>
+
+      <div class="glass">
+        <h2>Sample usage</h2>
+        <pre class="code">
+// Example: call in console
+secondFruit(["a","b","c"]) // => "b"
+sumArray([1,2,3]) // => 6
+        </pre>
+      </div>
+
+      <div class="glass">
+        <h2>Notes</h2>
+        <p class="muted">If the background does not load, check the path in the CSS <code>background</code> URL — it point's to the image provided.</p>
+      </div>
+    </aside>
+
+  </div>
+
+<script>
+
+/* 1) Scope demo */
+function scopeDemo() {
+  const out = [];
+  (function inner() {
+    if (true) {
+      var vVar = "I am var (declared inside block)";
+      let vLet = "I am let (declared inside block)";
+      const vConst = "I am const (declared inside block)";
+      out.push("Inside block: vVar is accessible -> " + vVar);
+      out.push("Inside block: vLet is accessible -> " + vLet);
+      out.push("Inside block: vConst is accessible -> " + vConst);
+    }
+    try {
+      out.push("Outside block (inside function): vVar -> " + vVar);
+    } catch (e) {
+      out.push("Outside block: vVar -> NOT accessible");
+    }
+    try {
+      out.push("Outside block: vLet -> " + vLet);
+    } catch (e) {
+      out.push("Outside block: vLet -> NOT accessible (block-scoped)");
+    }
+    try {
+      out.push("Outside block: vConst -> " + vConst);
+    } catch (e) {
+      out.push("Outside block: vConst -> NOT accessible (block-scoped)");
+    }
+  })();
+
+  return out.join("\n");
+}
+
+/* 2) fruits array & second fruit */
+const fruits = ["apple", "banana", "mango", "orange", "grapes"];
+function secondFruit(arr) {
+  return arr[1];
+}
+
+/* 3) push then pop */
+function pushThenPop(arr, elem) {
+  arr.push(elem);
+  arr.pop();
+  return arr;
+}
+
+/* 4) square numbers using map */
+function squareNumbers(arr) {
+  return arr.map(x => x * x);
+}
+
+/* 5) filter out even numbers (keep odd) */
+function filterOdds(arr) {
+  return arr.filter(n => n % 2 !== 0);
+}
+
+/* 6) person object greeting */
+const person = { name: "sahil", age: 23, occupation: "Developer" };
+function greetPerson(p) {
+  const msg = `Hi, I'm ${p.name}. I'm ${p.age} years old and I work as a ${p.occupation}.`;
+  console.log(msg);
+  return msg;
+}
+
+/* 7) area of rectangle */
+function rectangleArea(rect) {
+  return rect.width * rect.height;
+}
+
+/* 8) return object keys */
+function getObjectKeys(obj) {
+  return Object.keys(obj);
+}
+
+/* 9) merge two objects using Object.assign */
+function mergeObjects(a, b) {
+  return Object.assign({}, a, b);
+}
+
+/* 10) sum using reduce */
+function sumArray(arr) {
+  return arr.reduce((acc, x) => acc + x, 0);
+}
+
+/* UI wiring */
+document.getElementById('runScope').addEventListener('click', () => {
+  const res = scopeDemo();
+  document.getElementById('scopeOut').textContent = res;
+  console.log("Scope demo:\n" + res);
+});
+
+document.getElementById('secondFruitBtn').addEventListener('click', () => {
+  const f = secondFruit(fruits);
+  document.getElementById('fruitOut').textContent = `fruits = [${fruits.join(", ")}]\nsecond fruit = ${String(f)}`;
+  console.log("Second fruit:", f);
+});
+
+document.getElementById('pushPopBtn').addEventListener('click', () => {
+  const base = ["apple", "banana", "mango"];
+  const elem = document.getElementById('pushVal').value || "kiwi";
+  const modified = pushThenPop(base, elem);
+  document.getElementById('pushPopOut').textContent = `start array: ["apple","banana","mango"]\npush "${elem}" then pop -> result: [${modified.join(", ")}]`;
+  console.log("pushThenPop result:", modified);
+});
+
+document.getElementById('squareBtn').addEventListener('click', () => {
+  const src = [1,2,3,4,5];
+  const out = squareNumbers(src);
+  document.getElementById('squareOut').textContent = `source: [${src.join(", ")}]\nsquared: [${out.join(", ")}]`;
+  console.log("squared:", out);
+});
+
+document.getElementById('filterBtn').addEventListener('click', () => {
+  const src = [1,2,3,4,5,6,7,8,9,10];
+  const out = filterOdds(src);
+  document.getElementById('filterOut').textContent = `source: [${src.join(", ")}]\nodds: [${out.join(", ")}]`;
+  console.log("filtered odds:", out);
+});
+
+document.getElementById('greetBtn').addEventListener('click', () => {
+  const msg = greetPerson(person);
+  document.getElementById('greetOut').textContent = msg;
+});
+
+document.getElementById('areaBtn').addEventListener('click', () => {
+  const r = { width: 6, height: 4 };
+  const a = rectangleArea(r);
+  document.getElementById('areaOut').textContent = `rectangle ${JSON.stringify(r)} -> area = ${a}`;
+  console.log("area:", a);
+});
+
+document.getElementById('keysBtn').addEventListener('click', () => {
+  const obj = { a:1, b:2, c:3 };
+  const keys = getObjectKeys(obj);
+  document.getElementById('keysOut').textContent = `object: ${JSON.stringify(obj)}\nkeys: [${keys.join(", ")}]`;
+  console.log("keys:", keys);
+});
+
+document.getElementById('mergeBtn').addEventListener('click', () => {
+  const o1 = { x:1 };
+  const o2 = { y:2, z:3 };
+  const merged = mergeObjects(o1, o2);
+  document.getElementById('mergeOut').textContent = `o1: ${JSON.stringify(o1)}\no2: ${JSON.stringify(o2)}\nmerged: ${JSON.stringify(merged)}`;
+  console.log("merged:", merged);
+});
+
+document.getElementById('sumBtn').addEventListener('click', () => {
+  const arr = [2,4,6,8];
+  const s = sumArray(arr);
+  document.getElementById('sumOut').textContent = `array: [${arr.join(", ")}]\nsum: ${s}`;
+  console.log("sum:", s);
+});
+
+/* run some demos on load to populate initial outputs */
+window.addEventListener('load', () => {
+  document.getElementById('secondFruitBtn').click();
+  document.getElementById('greetBtn').click();
+});
+</script>
+</body>
+</html>
