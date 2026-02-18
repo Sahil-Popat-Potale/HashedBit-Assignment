@@ -1,0 +1,641 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Skeuomorphic Assignment — Header / Menu / Sidebar / Main / Footer</title>
+
+<style>
+  :root{
+    --green-accent: #0fdc6b;
+    --silver-1: #e6e9ec;
+    --silver-2: #cfd5da;
+    --panel-shadow: rgba(20,20,20,0.25);
+    --text-dark: #0b0b0b;
+    --glass: rgba(255,255,255,0.6);
+    --radius: 12px;
+    --max-width: 1100px;
+  }
+
+  /* Night theme variables */
+  body[data-theme="dark"]{
+    --green-accent: #1aff9b; /* brighter green for dark mode */
+    --silver-1: #141414;     /* dark panels */
+    --silver-2: #222427;
+    --panel-shadow: rgba(0,0,0,0.8);
+    --text-dark: #e9f7ef;
+    --glass: rgba(0,0,0,0.4);
+    background-color: #070707;
+  }
+
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    margin:0;
+    color:var(--text-dark);
+    background:
+      radial-gradient(circle at 20% 10%, rgba(0,0,0,0.03), transparent 10%),
+      linear-gradient(180deg, var(--silver-1), var(--silver-2));
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+    padding:20px;
+    display:flex;
+    justify-content:center;
+  }
+
+  .wrap{
+    width:100%;
+    max-width:var(--max-width);
+    display:grid;
+    grid-template-areas:
+      "header header"
+      "menu menu"
+      "sidebar main"
+      "footer footer";
+    grid-template-columns: 260px 1fr;
+    gap:18px;
+    align-items:start;
+  }
+
+  /* -------------------------
+     Skeuomorphic panel base
+     ------------------------- */
+  .panel{
+    border-radius:var(--radius);
+    background: linear-gradient(180deg, rgba(255,255,255,0.6), rgba(255,255,255,0.15));
+    box-shadow:
+      6px 6px 14px rgba(0,0,0,0.18),
+      -6px -6px 14px rgba(255,255,255,0.6);
+    padding:14px;
+    transition: background .3s, box-shadow .3s, transform .08s;
+  }
+
+  body[data-theme="dark"] .panel{
+    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+    box-shadow:
+      10px 10px 20px rgba(0,0,0,0.8),
+      -6px -6px 12px rgba(255,255,255,0.02);
+  }
+
+  /* -------------------------
+     Header
+     ------------------------- */
+  header{
+    grid-area: header;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:12px;
+  }
+
+  .brand{
+    display:flex;
+    align-items:center;
+    gap:12px;
+  }
+
+  /* simple SVG logo */
+  .logo{
+    width:60px;
+    height:60px;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    border-radius:12px;
+    background: linear-gradient(135deg, var(--silver-1), var(--silver-2));
+    box-shadow: inset 3px 3px 6px rgba(0,0,0,0.12), inset -2px -2px 6px rgba(255,255,255,0.6);
+  }
+
+  .brand h1{
+    font-size:1.1rem;
+    margin:0;
+    letter-spacing:0.6px;
+  }
+
+  /* social links on the right */
+  .socials{
+    display:flex;
+    gap:10px;
+    align-items:center;
+  }
+
+  .socials a{
+    display:inline-flex;
+    width:42px;
+    height:42px;
+    align-items:center;
+    justify-content:center;
+    border-radius:10px;
+    text-decoration:none;
+    color:var(--text-dark);
+    background: linear-gradient(180deg, rgba(255,255,255,0.75), rgba(255,255,255,0.35));
+    box-shadow: 3px 3px 8px rgba(0,0,0,0.12), -2px -2px 6px rgba(255,255,255,0.6);
+    transition: transform .12s, box-shadow .12s;
+  }
+  .socials a:focus, .socials a:hover{
+    transform: translateY(-3px);
+  }
+
+  /* Day / Night switch */
+  .theme-toggle{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-left:8px;
+  }
+
+  .toggle{
+    --size:46px;
+    width:var(--size);
+    height:26px;
+    background: linear-gradient(180deg, #dfe6ea, #c3c9ce);
+    border-radius:26px;
+    padding:3px;
+    display:inline-flex;
+    align-items:center;
+    position:relative;
+    box-shadow: 3px 3px 8px rgba(0,0,0,0.12), inset 0 2px 4px rgba(255,255,255,0.4);
+    cursor:pointer;
+  }
+
+  body[data-theme="dark"] .toggle{
+    background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
+    box-shadow: inset 0 -3px 8px rgba(0,0,0,0.6);
+  }
+
+  .toggle .knob{
+    width:20px;
+    height:20px;
+    border-radius:50%;
+    background: linear-gradient(180deg, #fff, #ddd);
+    transform: translateX(0);
+    transition: transform .25s;
+    box-shadow: 2px 2px 6px rgba(0,0,0,0.18), inset 0 1px 0 rgba(255,255,255,0.6);
+  }
+
+  body[data-theme="dark"] .toggle .knob{
+    background: linear-gradient(180deg, #0a0a0a, #222);
+  }
+
+  body[data-theme="dark"] .toggle[data-on="true"] .knob{
+    transform: translateX(20px);
+  }
+  .toggle[data-on="true"] .knob{ transform: translateX(20px); }
+
+  /* -------------------------
+     Menu bar
+     ------------------------- */
+  nav{
+    grid-area: menu;
+    display:flex;
+    gap:14px;
+    align-items:center;
+    background:transparent;
+  }
+
+  .menu{
+    display:flex;
+    gap:12px;
+    list-style:none;
+    margin:0;
+    padding:0;
+  }
+
+  .menu li a{
+    display:inline-flex;
+    padding:10px 16px;
+    border-radius:10px;
+    text-decoration:none;
+    color:var(--text-dark);
+    font-weight:600;
+    background: linear-gradient(180deg, rgba(255,255,255,0.6), rgba(255,255,255,0.2));
+    box-shadow: 4px 6px 12px rgba(0,0,0,0.08), inset -2px -2px 5px rgba(255,255,255,0.5);
+    transition: transform .12s, box-shadow .12s;
+  }
+
+  .menu li a:focus, .menu li a:hover{
+    transform: translateY(-3px);
+  }
+
+  .menu li a.active{
+    background: linear-gradient(180deg, rgba(0,0,0,0.02), rgba(0,0,0,0.06));
+    box-shadow: inset 3px 3px 8px rgba(0,0,0,0.12), inset -2px -2px 6px rgba(255,255,255,0.12);
+    color:var(--green-accent);
+    border:1px solid rgba(0,0,0,0.06);
+  }
+
+  /* -------------------------
+     Sidebar
+     ------------------------- */
+  aside{
+    grid-area:sidebar;
+    width:100%;
+    min-width:220px;
+  }
+
+  .sidebar-inner{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+  }
+
+  .sidebar-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+  }
+
+  .collapse-btn{
+    border:none;
+    background:transparent;
+    cursor:pointer;
+    padding:6px;
+    border-radius:8px;
+    font-weight:700;
+  }
+
+  .custom-list{
+    display:grid;
+    gap:10px;
+    margin-top:6px;
+  }
+
+  .data-item{
+    padding:10px;
+    border-radius:10px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.7), rgba(255,255,255,0.35));
+    box-shadow: inset 3px 3px 6px rgba(0,0,0,0.06), -3px -3px 6px rgba(255,255,255,0.6);
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:8px;
+  }
+
+  /* -------------------------
+     Main content + cards
+     ------------------------- */
+  main{
+    grid-area:main;
+    min-height:300px;
+  }
+
+  .cards{
+    display:grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px,1fr));
+    gap:18px;
+  }
+
+  .card{
+    border-radius:14px;
+    padding:14px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.75), rgba(255,255,255,0.4));
+    box-shadow:
+      8px 10px 22px rgba(0,0,0,0.10),
+      inset -4px -4px 8px rgba(255,255,255,0.6),
+      inset 4px 4px 8px rgba(0,0,0,0.04);
+    transition: transform .12s, box-shadow .12s;
+  }
+
+  .card:hover{ transform: translateY(-6px); }
+
+  .card .imgwrap{
+    height:140px;
+    border-radius:10px;
+    overflow:hidden;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:linear-gradient(135deg, rgba(0,0,0,0.03), rgba(255,255,255,0.02));
+    box-shadow: inset 3px 3px 8px rgba(0,0,0,0.06), -2px -2px 6px rgba(255,255,255,0.6);
+    margin-bottom:12px;
+  }
+
+  .card h3{ margin:0 0 8px 0; font-size:1.05rem; letter-spacing:0.2px; }
+  .card p{ margin:0; color: rgba(0,0,0,0.7); line-height:1.45; }
+
+  body[data-theme="dark"] .card p{ color: rgba(255,255,255,0.85); }
+
+  /* -------------------------
+     Footer
+     ------------------------- */
+  footer{
+    grid-area:footer;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:12px;
+  }
+
+  .muted{ color:rgba(0,0,0,0.55); font-size:0.95rem; }
+  body[data-theme="dark"] .muted{ color:rgba(255,255,255,0.6) }
+
+  /* -------------------------
+     Responsive tweaks
+     ------------------------- */
+  @media (max-width:880px){
+    .wrap{
+      grid-template-areas:
+        "header"
+        "menu"
+        "main"
+        "sidebar"
+        "footer";
+      grid-template-columns: 1fr;
+    }
+    aside{ order:4 }
+    .menu{ flex-wrap:wrap }
+  }
+
+  @media (max-width:520px){
+    .logo{ width:48px; height:48px }
+    .menu li a{ padding:8px 12px; font-size:0.95rem }
+    .socials a{ width:38px; height:38px }
+    .toggle{ --size:40px }
+  }
+
+  /* focus outline for accessibility */
+  a:focus, button:focus{ outline: 3px solid rgba(15,220,107,0.12); outline-offset:3px; }
+
+</style>
+</head>
+<body>
+  <div class="wrap" role="application" aria-label="Skeuomorphic assignment layout">
+
+    <!-- HEADER -->
+    <header class="panel" >
+      <div class="brand" aria-hidden="false">
+        <div class="logo" title="Logo">
+          <!-- simple gear + leaf logo SVG combining 'tech' and 'green' -->
+          <svg width="44" height="44" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <defs>
+              <linearGradient id="g1" x1="0" x2="1">
+                <stop offset="0" stop-color="#bfc7cc"/>
+                <stop offset="1" stop-color="#7f8b92"/>
+              </linearGradient>
+            </defs>
+            <rect x="6" y="6" width="52" height="52" rx="10" fill="url(#g1)" stroke="rgba(0,0,0,0.08)"/>
+            <g transform="translate(12,12)" fill="#07120a">
+              <path d="M20 2c-6 0-10 4-10 10 0 6 6 12 10 15 4-3 10-9 10-15 0-6-4-10-10-10z" fill="#0fdc6b"/>
+              <circle cx="20" cy="4" r="3" fill="rgba(0,0,0,0.08)"/>
+            </g>
+          </svg>
+        </div>
+
+        <div>
+          <h1>Project — SkeuoUI</h1>
+          <div style="font-size:0.85rem; color:rgba(0,0,0,0.6)">HTML & CSS Assignment</div>
+        </div>
+      </div>
+
+      <div class="socials" aria-hidden="false">
+        <!-- social icons (SVG) -->
+        <a href="#" aria-label="LinkedIn" title="LinkedIn">
+          <svg width="18" height="18" viewBox="0 0 24 24"><path fill="currentColor" d="M4.98 3.5C4.98 4.88 3.88 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1 4.98 2.12 4.98 3.5zM0 24h5V7H0v17zM7 7h4.8v2.3h0.1c0.7-1.3 2.4-2.3 4.9-2.3C23 7 24 12 24 17.5V24h-5v-6.5c0-2-0.1-4.6-3-4.6-3 0-3.5 2.3-3.5 4.4V24H7V7z"/></svg>
+        </a>
+        <a href="#" aria-label="GitHub" title="GitHub">
+          <svg width="18" height="18" viewBox="0 0 24 24"><path fill="currentColor" d="M12 .5C5.4.5 0 5.9 0 12.5c0 5.3 3.4 9.8 8.1 11.4.6.1.8-.3.8-.6v-2c-3.3.7-4-1.6-4-1.6-.5-1.4-1.2-1.8-1.2-1.8-1-.7.1-.7.1-.7 1.1.1 1.7 1.1 1.7 1.1 1 .1 1.6-.8 1.9-1.2.1-.7.4-1.2.8-1.6-2.7-.3-5.5-1.3-5.5-5.7 0-1.2.4-2.1 1.1-2.9-.1-.3-.5-1.4.1-2.9 0 0 .9-.3 3 1.1.9-.2 1.9-.3 2.9-.3s2 .1 2.9.3c2.1-1.4 3-1.1 3-1.1.6 1.5.2 2.6.1 2.9.7.8 1.1 1.7 1.1 2.9 0 4.4-2.8 5.4-5.5 5.7.4.3.7.8.7 1.6v2.4c0 .3.2.7.8.6C20.6 22.3 24 17.8 24 12.5 24 5.9 18.6.5 12 .5z"/></svg>
+        </a>
+
+        <!-- theme toggle -->
+        <div class="theme-toggle" title="Switch day / night">
+          <span style="font-size:0.9rem; color: rgba(0,0,0,0.6)">Theme</span>
+          <button class="toggle" id="themeToggle" role="switch" aria-checked="false" aria-label="Toggle day night">
+            <span class="knob" aria-hidden="true"></span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- MENU -->
+    <nav>
+      <ul class="menu" role="menubar" aria-label="Main menu">
+        <li role="none"><a href="#home" class="active" role="menuitem">Home</a></li>
+        <li role="none"><a href="#about" role="menuitem">About</a></li>
+        <li role="none"><a href="#services" role="menuitem">Services</a></li>
+        <li role="none"><a href="#contact" role="menuitem">Contact</a></li>
+      </ul>
+    </nav>
+
+    <!-- SIDEBAR (Custom Data) -->
+    <aside>
+      <div class="sidebar-inner panel">
+        <div class="sidebar-header">
+          <strong>Custom Data</strong>
+          <button class="collapse-btn" id="sidebarToggle" aria-expanded="true" aria-controls="sidebarList">–</button>
+        </div>
+
+        <div id="sidebarList" class="custom-list" role="region" aria-live="polite">
+          <!-- Example custom items: you can replace with any data -->
+          <div class="data-item"><div>Student:</div><div><strong>Sahil Popat</strong></div></div>
+          <div class="data-item"><div>Course:</div><div>MCA — Web Dev</div></div>
+          <div class="data-item"><div>Assignment:</div><div>Design One Webpage</div></div>
+          <div class="data-item"><div>Grade Target:</div><div style="color:var(--green-accent); font-weight:700">A+</div></div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main>
+      <section id="home" class="panel" style="margin-bottom:14px;">
+        <h2 style="margin:0 0 8px 0">Home</h2>
+        <p class="muted">This page demonstrates a polished skeuomorphic layout with functional controls and semantic markup. Scroll or use the menu — active states and theme persist across visits.</p>
+      </section>
+
+      <section id="about" class="panel" style="margin-bottom:14px;">
+        <h2 style="margin:0 0 8px 0">About</h2>
+        <p class="muted">Focus: visual fidelity (skeuomorphism), responsive behavior, accessible controls, and clean HTML/CSS structure for easy grading.</p>
+      </section>
+
+      <section id="services" class="panel" style="margin-bottom:14px;">
+        <h2 style="margin:0 0 12px 0">Services — Content Boxes</h2>
+
+        <!-- Three boxes (title, image, description) -->
+        <div class="cards" aria-live="polite">
+          <!-- Card 1 -->
+          <article class="card" tabindex="0" aria-labelledby="c1title" role="article">
+            <div class="imgwrap" aria-hidden="true">
+              <!-- inline SVG image placeholder -->
+              <svg width="240" height="120" viewBox="0 0 240 120" xmlns="http://www.w3.org/2000/svg">
+                <rect width="240" height="120" rx="8" fill="url(#m1)"/>
+                <defs>
+                  <linearGradient id="m1" x1="0" x2="1">
+                    <stop offset="0" stop-color="#eef7f0"/>
+                    <stop offset="1" stop-color="#cfeee0"/>
+                  </linearGradient>
+                </defs>
+                <g transform="translate(20,14)" fill="none" stroke="#0b6" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M10 40 Q40 10 80 40 T150 40" />
+                </g>
+              </svg>
+            </div>
+            <h3 id="c1title">Card Title One</h3>
+            <p>Short description for the first sample. Demonstrates an image, title and descriptive text — everything required by the assignment.</p>
+          </article>
+
+          <!-- Card 2 -->
+          <article class="card" tabindex="0" aria-labelledby="c2title" role="article">
+            <div class="imgwrap" aria-hidden="true">
+              <svg width="240" height="120" viewBox="0 0 240 120" xmlns="http://www.w3.org/2000/svg">
+                <rect width="240" height="120" rx="8" fill="url(#m2)"/>
+                <defs>
+                  <linearGradient id="m2" x1="0" x2="1">
+                    <stop offset="0" stop-color="#f5f7ff"/>
+                    <stop offset="1" stop-color="#dbe2ff"/>
+                  </linearGradient>
+                </defs>
+                <g transform="translate(36,24)" stroke="#556" stroke-width="5" fill="none">
+                  <circle cx="40" cy="16" r="16" />
+                  <path d="M8 60 L72 60" stroke="#556" stroke-width="6" stroke-linecap="round"/>
+                </g>
+              </svg>
+            </div>
+            <h3 id="c2title">Card Title Two</h3>
+            <p>This card simulates a product/feature box. Replace the SVG with real images if required by your assignment.</p>
+          </article>
+
+          <!-- Card 3 -->
+          <article class="card" tabindex="0" aria-labelledby="c3title" role="article">
+            <div class="imgwrap" aria-hidden="true">
+              <svg width="240" height="120" viewBox="0 0 240 120" xmlns="http://www.w3.org/2000/svg">
+                <rect width="240" height="120" rx="8" fill="url(#m3)"/>
+                <defs>
+                  <linearGradient id="m3" x1="0" x2="1">
+                    <stop offset="0" stop-color="#fff6e6"/>
+                    <stop offset="1" stop-color="#ffe9c6"/>
+                  </linearGradient>
+                </defs>
+                <g transform="translate(20,14)" stroke="#b86" stroke-width="4" fill="none">
+                  <rect x="8" y="8" width="80" height="56" rx="8" />
+                  <path d="M110 20 L170 36 L110 72" />
+                </g>
+              </svg>
+            </div>
+            <h3 id="c3title">Card Title Three</h3>
+            <p>Third box — same structure to show consistency. Use these boxes as content placeholders, demo images, or portfolio items.</p>
+          </article>
+        </div>
+      </section>
+
+      <section id="contact" class="panel" style="margin-bottom:14px;">
+        <h2 style="margin:0 0 8px 0">Contact</h2>
+        <p class="muted">Email: example@university.edu — Phone: (000) 000-0000</p>
+      </section>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="panel">
+      <div class="muted">Sample footer text — &copy; <span id="year"></span> — Assignment: HTML & CSS</div>
+      <div class="muted">Built with skeuomorphic style • Black · Green · Silver</div>
+    </footer>
+  </div>
+
+<script>
+/* -------------------------
+   JavaScript: interactions
+   - Theme toggle (persisted)
+   - Menu active link behavior (smooth scroll)
+   - Sidebar collapse
+   ------------------------- */
+
+(function(){
+  // helpful elements
+  const body = document.body;
+  const themeToggle = document.getElementById('themeToggle');
+  const sidebarToggle = document.getElementById('sidebarToggle');
+  const sidebarList = document.getElementById('sidebarList');
+  const menuLinks = document.querySelectorAll('.menu a');
+
+  // set footer year
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  // Initialize theme from localStorage or system preference
+  const saved = localStorage.getItem('skeuo-theme');
+  const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  if(saved === 'dark' || (!saved && prefersDark)){
+    body.setAttribute('data-theme','dark');
+    themeToggle.setAttribute('data-on','true');
+    themeToggle.setAttribute('aria-checked','true');
+  } else {
+    body.setAttribute('data-theme','light');
+    themeToggle.setAttribute('data-on','false');
+    themeToggle.setAttribute('aria-checked','false');
+  }
+
+  // Theme toggle click
+  themeToggle.addEventListener('click', () => {
+    const isOn = themeToggle.getAttribute('data-on') === 'true';
+    if(isOn){
+      body.setAttribute('data-theme','light');
+      themeToggle.setAttribute('data-on','false');
+      themeToggle.setAttribute('aria-checked','false');
+      localStorage.setItem('skeuo-theme','light');
+    } else {
+      body.setAttribute('data-theme','dark');
+      themeToggle.setAttribute('data-on','true');
+      themeToggle.setAttribute('aria-checked','true');
+      localStorage.setItem('skeuo-theme','dark');
+    }
+  });
+
+  // Sidebar collapse toggle
+  sidebarToggle.addEventListener('click', () => {
+    const expanded = sidebarToggle.getAttribute('aria-expanded') === 'true';
+    if(expanded){
+      sidebarList.style.display = 'none';
+      sidebarToggle.textContent = '+';
+      sidebarToggle.setAttribute('aria-expanded','false');
+    } else {
+      sidebarList.style.display = '';
+      sidebarToggle.textContent = '–';
+      sidebarToggle.setAttribute('aria-expanded','true');
+    }
+  });
+
+  // Smooth scrolling + active state management
+  function clearActive(){
+    menuLinks.forEach(a => a.classList.remove('active'));
+  }
+
+  menuLinks.forEach(link => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      const targetId = link.getAttribute('href').replace('#','');
+      const target = document.getElementById(targetId);
+      if(target){
+        target.scrollIntoView({behavior:'smooth', block:'start'});
+      }
+      clearActive();
+      link.classList.add('active');
+    });
+  });
+
+  // Optional: update active link on scroll (simple)
+  const sections = Array.from(document.querySelectorAll('main section'));
+  window.addEventListener('scroll', () => {
+    let found = false;
+    const topOffset = window.scrollY + 100;
+    for(let i = sections.length - 1; i >= 0; i--){
+      const sec = sections[i];
+      if(sec.offsetTop <= topOffset){
+        clearActive();
+        const id = sec.id;
+        const link = document.querySelector(`.menu a[href="#${id}"]`);
+        if(link){ link.classList.add('active'); found = true; break; }
+      }
+    }
+    if(!found) clearActive();
+  });
+
+  // small accessibility: allow keyboard toggle with Enter/Space for theme button
+  themeToggle.addEventListener('keydown', (ev) => {
+    if(ev.key === 'Enter' || ev.key === ' '){
+      ev.preventDefault();
+      themeToggle.click();
+    }
+  });
+
+})();
+</script>
+</body>
+</html>
