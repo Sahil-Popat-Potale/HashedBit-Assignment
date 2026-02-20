@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Dynamic CSS</title>
+    <style>
+        .text-here {
+            font-size: 55px;
+            font-family: sans-serif;
+            color: black;
+            text-decoration: none;
+            font-style: normal;
+            font-weight: normal;
+            line-height: normal;
+            text-align: left;
+            letter-spacing: normal;
+            word-spacing: normal;
+        }
+    </style>
+</head>
+<body>
+    <div class='text-here' id='text-container'>This is some example text</div>
+    <input type="text" id="colorbox">
+    <button id="colorchange">Change Colour</button> <br><br>
+    <input type="range" id="fontsize" min="10" max="100" value="55"> <br><br>
+
+    <button id="italic" class="stylebt">Italics</button>
+    <button id="underline" class="stylebt">Underline</button>
+    <button id="bold" class="stylebt">Bold</button> <br><br>
+
+    <select id="list">
+        <option value="serif">Serif</option>
+        <option value="sans-serif">Sans-Serif</option>
+        <option value="monospace">Monospace</option>
+        <option value="cursive">Cursive</option>
+        <option value="fantasy">Fantasy</option>
+    </select> <br><br>
+
+    <button id="getstyle">Get CSS</button> <br><br>
+    <p id="css-props"></p>
+
+    <script>
+        const textEl = document.getElementById('text-container');
+        const colorInput = document.getElementById('colorbox');
+        const colorBtn = document.getElementById('colorchange');
+        const sizeRange = document.getElementById('fontsize');
+        const italicBtn = document.getElementById('italic');
+        const underlineBtn = document.getElementById('underline');
+        const boldBtn = document.getElementById('bold');
+        const listSelect = document.getElementById('list');
+        const getStyleBtn = document.getElementById('getstyle');
+        const cssPropsP = document.getElementById('css-props');
+
+        // Keep a "friendly" color value (what user typed) so Get CSS prints a name/value,
+        // not the computed rgb(...) string. Default to 'black' (matches the CSS).
+        let friendlyColor = 'black';
+
+        // Initialize slider and text size (sync with CSS default)
+        (function init() {
+        // If the element has an inline size, use it; otherwise use the slider default (55)
+        const cs = window.getComputedStyle(textEl);
+        const currentSize = parseInt(cs.fontSize, 10) || parseInt(sizeRange.value, 10);
+        sizeRange.value = currentSize;
+        textEl.style.fontSize = sizeRange.value + 'px';
+        
+        // initialize font-family in case user wants to get it immediately
+        textEl.style.fontFamily = cs.fontFamily || listSelect.value;
+        })();
+
+        // Color change: set style and remember the user input
+        colorBtn.addEventListener('click', () => {
+        const v = colorInput.value.trim();
+        if (!v) return; // ignore empty
+        // apply value as-is (supports color names, hex, rgb, etc.)
+        textEl.style.color = v;
+        friendlyColor = v;
+        });
+
+        // Font size slider: update on input
+        sizeRange.addEventListener('input', () => {
+        const val = sizeRange.value;
+        textEl.style.fontSize = val + 'px';
+        });
+
+        // Toggle helpers (toggle the inline style and button active class)
+        function toggleUnderline() {
+            const cur = textEl.style.textDecoration;
+            if (cur && cur.indexOf('underline') !== -1) {
+                textEl.style.textDecoration = textEl.style.textDecoration
+                .split(/\s+/)
+                .filter(t => t !== 'underline')
+                .join(' ') || 'none';
+                underlineBtn.classList.remove('active');
+            } else {
+                // add underline while preserving other decorations if any
+                if (textEl.style.textDecoration && textEl.style.textDecoration !== 'none') {
+                    textEl.style.textDecoration += ' underline';
+                } else {
+                    textEl.style.textDecoration = 'underline';
+                }
+                    underlineBtn.classList.add('active');
+            }
+        }
+
+        function toggleItalic() {
+            const cur = textEl.style.fontStyle === 'italic' || window.getComputedStyle(textEl).fontStyle === 'italic';
+            if (cur && textEl.style.fontStyle === 'italic') {
+                textEl.style.fontStyle = 'normal';
+                italicBtn.classList.remove('active');
+            } else {
+                textEl.style.fontStyle = 'italic';
+                italicBtn.classList.add('active');
+            }
+        }
+
+        function toggleBold() {
+            // treat numeric >=700 as bold
+            const comp = window.getComputedStyle(textEl).fontWeight;
+            const isBold = (textEl.style.fontWeight === 'bold') || (parseInt(comp, 10) >= 700);
+            if (isBold && textEl.style.fontWeight === 'bold') {
+                textEl.style.fontWeight = 'normal';
+                boldBtn.classList.remove('active');
+            } else {
+                textEl.style.fontWeight = 'bold';
+                boldBtn.classList.add('active');
+            }
+        }
+
+        // Wire the style buttons
+        underlineBtn.addEventListener('click', toggleUnderline);
+        italicBtn.addEventListener('click', toggleItalic);
+        boldBtn.addEventListener('click', toggleBold);
+
+        // Font-family dropdown
+        listSelect.addEventListener('change', () => {
+        textEl.style.fontFamily = listSelect.value;
+        });
+
+        // Get CSS: assemble properties and write into #css-props
+        getStyleBtn.addEventListener('click', () => {
+        const cs = window.getComputedStyle(textEl);
+
+        // Color: use friendlyColor if user set a color via button,
+        // otherwise try to extract a sensible token from computed style.
+        let colorOut = friendlyColor || cs.color || 'black';
+
+        // Font size: prefer inline / style value if set, otherwise computed
+        const fontSizeOut = (textEl.style.fontSize && textEl.style.fontSize !== '') ? textEl.style.fontSize : cs.fontSize;
+
+        // Font family: prefer inline style value
+        const fontFamilyOut = (textEl.style.fontFamily && textEl.style.fontFamily !== '') ? textEl.style.fontFamily : cs.fontFamily;
+
+        // Text-decoration: check inline or computed
+        // Use 'underline' or 'none' per requirement
+        let textDecorationOut = 'none';
+        const decInline = textEl.style.textDecoration;
+        if (decInline && decInline.indexOf('underline') !== -1) {
+            textDecorationOut = 'underline';
+        } else {
+            // check computed
+            if (cs.textDecorationLine && cs.textDecorationLine.indexOf('underline') !== -1) {
+                textDecorationOut = 'underline';
+            }
+        }
+
+        // Font-style: 'italic' or 'normal'
+        const fontStyleOut = (textEl.style.fontStyle && textEl.style.fontStyle !== '') ? textEl.style.fontStyle : cs.fontStyle;
+
+        // Font-weight: prefer 'bold' or 'normal' text
+        let fw = (textEl.style.fontWeight && textEl.style.fontWeight !== '') ? textEl.style.fontWeight : cs.fontWeight;
+        // Normalize numeric weights to 'bold' when >=700
+        if (!isNaN(parseInt(fw, 10))) {
+            fw = (parseInt(fw, 10) >= 700) ? 'bold' : 'normal';
+        }
+        const fontWeightOut = fw;
+
+        // Build output list (comma + space separated)
+        const props = [
+            `color: ${colorOut}`,
+            `font-size: ${fontSizeOut}`,
+            `font-family: ${fontFamilyOut}`,
+            `text-decoration: ${textDecorationOut}`,
+            `font-style: ${fontStyleOut}`,
+            `font-weight: ${fontWeightOut}`
+        ];
+
+        cssPropsP.textContent = props.join(', ');
+        });
+    </script>
+</body>
+</html>

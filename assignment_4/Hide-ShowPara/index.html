@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Hide Show Paragraph</title>
+</head>
+<body>
+    <h1>I am a headline made with HTML</h1> <br />
+    <p id="useless-paragraph">Useless paragraph.</p> <br />
+    <button onclick="toggleVisibility()">Toggle Button</button>
+
+    <script>
+        function toggleVisibility() {
+        const p = document.getElementById('useless-paragraph');
+        if (!p) return; // nothing to do if element missing
+
+        const isHidden = window.getComputedStyle(p).display === 'none';
+        if (isHidden) { p.style.display = ''; } 
+        else { p.style.display = 'none'; }
+        }
+    </script>
+</body>
+</html>
